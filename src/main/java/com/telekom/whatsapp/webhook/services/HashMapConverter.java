@@ -28,7 +28,7 @@ public class HashMapConverter implements AttributeConverter<Map<String, Object>,
 
     @Override
     public Map<String, Object> convertToEntityAttribute(String jsonObject) {
-        Map<String, Object> mappedValues = new HashMap<>();
+        Map<String, Object> mappedValues = new HashMap<String, Object>();
         
         try {
             mappedValues = objectMapper.readValue(jsonObject, Map.class);

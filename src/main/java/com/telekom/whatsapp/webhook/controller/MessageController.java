@@ -2,6 +2,7 @@ package com.telekom.whatsapp.webhook.controller;
 
 import java.util.Collection;
 import java.util.Date;
+import java.util.Optional;
 
 import javax.validation.Valid;
 
@@ -34,10 +35,16 @@ public class MessageController {
     }
 
     @GetMapping("")
-    public ResponseEntity<Collection<Message>> all() {
-
+    public ResponseEntity<Collection<Message>> all(@RequestParam(required = false) Optional<Integer> page) {
+        Collection<Message> msgs;
         logger.info("Received GET Request");
-        Collection<Message> msgs = messageRepositoryService.getMessages("*");
+
+        if (page.isPresent()) {
+            msgs = messageRepositoryService.getMessagesPaged("*", page.get());
+        } else {
+            msgs = messageRepositoryService.getMessages("*");
+        }
+        
         return ResponseEntity.ok(msgs);
     }
 
@@ -54,19 +61,6 @@ public class MessageController {
         Date timestamp = new Date();
         String newState = "pulled";
         messageRepositoryService.updateMessageState(id, timestamp, newState);
-    }
-
-    // how to handle errors?
-    // when 1 message is not found or another error occures then the whole request results in an error
-    // if the request was handled partly then client needs to know which id were patched/deleted successfully
-    @PatchMapping("")
-    public void updateStatuses(@RequestBody Collection<String> messages) {
-        logger.info("Received PATCH Request");
-        Date timestamp = new Date();
-        String newState = "pulled";
-        messages.forEach(messageId -> {
-            messageRepositoryService.updateMessageState(messageId, timestamp, newState);
-        });
     }
 
     @PostMapping("")

@@ -14,6 +14,7 @@ public interface MessageService {
     public abstract Message getMessage(String id) throws NotFoundException;
     // Get all messages matching status
     // "*" => all
+    public abstract Collection<Message> getMessagesPaged(String status, int page);
     public abstract Collection<Message> getMessages(String status);
     // Delete a message, e.g. when it was pulled by client
     public abstract void deleteMessage(String id) throws NotFoundException;
@@ -24,4 +25,5 @@ public interface MessageService {
 
     // returns Statuses of all messages
     public abstract Collection<Status> getStatuses();
+    public abstract Collection<Status> getStatusesPaged(int page);
 }

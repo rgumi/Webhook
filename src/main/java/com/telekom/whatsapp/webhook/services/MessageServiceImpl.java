@@ -12,7 +12,9 @@ import com.telekom.whatsapp.webhook.repository.ContactRepository;
 import com.telekom.whatsapp.webhook.repository.MessageRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import org.slf4j.Logger;
@@ -20,6 +22,9 @@ import org.slf4j.LoggerFactory;
 
 @Service
 public class MessageServiceImpl implements MessageService {
+
+    @Value("${webhook.message.page_size}")
+    private int pageSize;
 
     @Autowired
     private MessageRepository messageRepository;
@@ -66,6 +71,18 @@ public class MessageServiceImpl implements MessageService {
     }
 
     @Override
+    public Collection<Message> getMessagesPaged(String status, int page) {
+        logger.debug("Querying all messages in repository");
+
+        Collection<Message> msgCollection = new ArrayList<>();
+        
+        if (status.equals("*")) messageRepository.findAll(PageRequest.of(page, pageSize)).forEach(msgCollection::add);
+        if (!status.equals("*")) messageRepository.findByStatus(status, PageRequest.of(page, pageSize)).forEach(msgCollection::add);
+        
+        return msgCollection;
+    }
+
+    @Override
     public Collection<Message> getMessages(String status) {
         logger.debug("Querying all messages in repository");
 
@@ -104,6 +121,13 @@ public class MessageServiceImpl implements MessageService {
     public Collection<Status> getStatuses() {
         Collection<Status> msgCollection = new ArrayList<>();
         messageRepository.getStatuses().forEach(msgCollection::add);
+        return msgCollection;
+    }
+
+    @Override
+    public Collection<Status> getStatusesPaged(int page) {
+        Collection<Status> msgCollection = new ArrayList<>();
+        messageRepository.getStatuses(PageRequest.of(page, pageSize)).forEach(msgCollection::add);
         return msgCollection;
     }
 }

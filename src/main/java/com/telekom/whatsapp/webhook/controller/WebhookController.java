@@ -1,6 +1,7 @@
 package com.telekom.whatsapp.webhook.controller;
 
 import java.util.Date;
+import java.util.Optional;
 
 import javax.validation.Valid;
 
@@ -61,11 +62,17 @@ class WebhookController {
         value = "/news",
         produces = "application/json; charset=UTF-8"
     )
-    public ResponseEntity<Webhook>  getNews(){
+    public ResponseEntity<Webhook>  getNews(@RequestParam(required = false) Optional<Integer> page){
         logger.info("Received GET Request");
         Webhook wh = new Webhook();
-        wh.setStatuses(messageRepositoryService.getStatuses());
-        wh.setMessages(messageRepositoryService.getMessages("received"));
+
+        if (page.isPresent()) {
+            wh.setStatuses(messageRepositoryService.getStatusesPaged(page.get()));
+            wh.setMessages(messageRepositoryService.getMessagesPaged("received", page.get()));
+        } else {
+            wh.setStatuses(messageRepositoryService.getStatuses());
+            wh.setMessages(messageRepositoryService.getMessages("received"));     
+        }
 
         // set status of pulled messages to "pulled" -> client does that 
         // with endpoint PATCH /message/{id}
