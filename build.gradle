@@ -1,0 +1,67 @@
+buildscript {
+    ext {
+        springBootVersion = '2.2.5.RELEASE'
+    }
+    repositories {
+        jcenter()
+        mavenCentral()
+        maven { url "https://repo.spring.io/plugins-release" }
+        maven { url "https://repo.spring.io/milestone" }
+        maven { url "https://plugins.gradle.org/m2/" }
+    }
+    dependencies {
+        classpath "org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}"
+        classpath "org.springframework.build.gradle:propdeps-plugin:0.0.7"
+        classpath "io.spring.gradle:dependency-management-plugin:1.0.7.RELEASE"
+        classpath "io.swagger:swagger-codegen:2.3.1"
+    }
+}
+
+apply plugin: 'java'
+apply plugin: 'org.springframework.boot'
+apply plugin: 'io.spring.dependency-management'
+
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+group = 'com.telekom.whatsapp.webhook'
+description = 'Webhook API for managing WA Biz API'
+defaultTasks 'bootRun'
+
+repositories {
+    maven {
+        url 'https://maven-central.storage.googleapis.com'
+    }
+    jcenter()
+    mavenCentral()
+}
+
+dependencies {
+    implementation ('org.springframework.boot:spring-boot-starter-actuator')
+    implementation ('org.springframework.boot:spring-boot-starter-aop')
+    implementation ('org.springframework.boot:spring-boot-starter-web')
+    //implementation ('org.springframework.boot:spring-boot-starter-security')
+    //implementation ('org.springframework.security:spring-security-test')
+    //implementation ('org.springframework.security:spring-security-data')
+    implementation ("org.springframework.boot:spring-boot-starter-data-jpa")
+    implementation ("org.springframework.boot:spring-boot-starter-cache")
+    runtimeOnly('mysql:mysql-connector-java')
+    runtimeOnly('com.h2database:h2')
+
+    runtimeOnly('org.springframework.boot:spring-boot-devtools')
+    testImplementation('junit:junit:4.12')
+}
+
+
+springBoot {
+    mainClassName = 'com.telekom.whatsapp.webhook.Application'
+}
+
+
+sourceSets {
+    main {
+        java {
+            srcDir 'src/main/java'
+        }
+    }
+}
