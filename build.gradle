@@ -13,25 +13,35 @@ buildscript {
         classpath "org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}"
         classpath "org.springframework.build.gradle:propdeps-plugin:0.0.7"
         classpath "io.spring.gradle:dependency-management-plugin:1.0.7.RELEASE"
-        classpath "io.swagger:swagger-codegen:2.3.1"
+        //classpath "io.swagger:swagger-codegen:2.3.1"
+        classpath 'org.owasp:dependency-check-gradle:5.3.1'
+        classpath "gradle.plugin.com.gorylenko.gradle-git-properties:gradle-git-properties:2.2.2"
     }
 }
 
 apply plugin: 'java'
 apply plugin: 'org.springframework.boot'
 apply plugin: 'io.spring.dependency-management'
-
+apply plugin: 'org.owasp.dependencycheck'
 
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
-group = 'com.telekom.whatsapp.webhook'
+
+group = 'com.telekom.whatsapp'
+version = '0.0.2'
 description = 'Webhook API for managing WA Biz API'
 defaultTasks 'bootRun'
 
 repositories {
-    maven {
-        url 'https://maven-central.storage.googleapis.com'
+    maven { 
+        // "/" after maven-central is necessary!
+        url 'http://localhost:8081/repository/maven-central/' 
+        credentials {
+            username "admin"
+            password "admin"
+        }
     }
+    maven { url 'https://maven-central.storage.googleapis.com' }
     jcenter()
     mavenCentral()
 }
@@ -39,17 +49,19 @@ repositories {
 dependencies {
     implementation ('org.springframework.boot:spring-boot-starter-actuator')
     implementation ('org.springframework.boot:spring-boot-starter-aop')
-    implementation ('org.springframework.boot:spring-boot-starter-web')
-    //implementation ('org.springframework.boot:spring-boot-starter-security')
-    //implementation ('org.springframework.security:spring-security-test')
-    //implementation ('org.springframework.security:spring-security-data')
     implementation ("org.springframework.boot:spring-boot-starter-data-jpa")
+    implementation ('org.springframework.boot:spring-boot-starter-web')
+    implementation ('org.springframework.boot:spring-boot-starter-security')
+    implementation (group: 'io.jsonwebtoken', name: 'jjwt', version: '0.9.1')
     //implementation ("org.springframework.boot:spring-boot-starter-cache")
-    runtimeOnly('mysql:mysql-connector-java')
-    runtimeOnly('com.h2database:h2')
+    //implementation ('org.springframework.security:spring-security-data')
 
-    runtimeOnly('org.springframework.boot:spring-boot-devtools')
-    testImplementation('junit:junit:4.12')
+    runtimeOnly ('mysql:mysql-connector-java')
+    runtimeOnly ('org.springframework.boot:spring-boot-devtools')
+    
+    testImplementation ('org.springframework.security:spring-security-test')
+    testImplementation ('junit:junit:4.12')
+    testRuntimeOnly ('com.h2database:h2')
 }
 
 
@@ -63,5 +75,44 @@ sourceSets {
         java {
             srcDir 'src/main/java'
         }
+    }
+}
+
+// ADD SOME INFO TO THE /INFO ENDPOINT PROVIDED BY ACTUATOR
+
+apply plugin: 'com.gorylenko.gradle-git-properties'
+
+processResources {
+    filesMatching("**/application.yml") {
+        expand( project.properties )
+    }
+}
+
+// PUBLISHING TO PRIVATE NEXUS REPOSITORY
+
+apply plugin: 'maven-publish'
+
+publishing {
+    println "Archives Artifacts: "
+    configurations.archives.allArtifacts.each { artifact ->
+        println artifact.file
+    }
+
+    publications {
+        maven(MavenPublication) {
+            artifact("build/libs/webhook-$version"+".jar") {
+                extension 'jar'
+            }
+        }
+    }
+    repositories {
+       maven {
+            name = "releases"
+            url "http://localhost:8081/repository/maven-releases"
+            credentials {
+                username "admin"
+                password "admin"
+            }
+       }
     }
 }

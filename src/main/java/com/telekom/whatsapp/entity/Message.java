@@ -20,17 +20,12 @@ import com.telekom.whatsapp.webhook.services.HashMapConverter;
 
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
-import org.springframework.data.domain.Persistable;
 
 @Entity
 @Table(name = "messages")
-public class Message implements Serializable, Persistable<String> {
+public class Message implements Serializable {
 
     private static final long serialVersionUID = 123L;
-
-    @Transient
-    private boolean isNew = true;
-
 
     @Id
     @Column(name = "id", nullable = false)
@@ -79,19 +74,6 @@ public class Message implements Serializable, Persistable<String> {
 
     public Message() {}
 
-    @Transient
-    @Override
-    @JsonIgnore
-    public boolean isNew() {
-        return this.isNew;
-    }
-
-     @PrePersist
-     @PostLoad
-     public void markNotNew() {
-         this.isNew = false;
-     }
-
     // setter 
 
     @JsonAlias({"text"})
@@ -101,7 +83,6 @@ public class Message implements Serializable, Persistable<String> {
         if (!map.containsKey("body")) throw new NotFoundException("Could not find attribute \"body\"");
 
         content.put("body", map.get("body"));
-        System.out.println(content);
     }
 
     @JsonAlias({"document"})
@@ -138,7 +119,6 @@ public class Message implements Serializable, Persistable<String> {
 
     @JsonProperty("id")
     @NotNull(message = "id cannot be null")
-    @Override
     public String getId() {
         return this.id;
     }
@@ -167,5 +147,13 @@ public class Message implements Serializable, Persistable<String> {
     @JsonGetter("contact_info")
     public Contact getContact() {
         return this.contact;
+    }
+
+    @JsonProperty("href")
+    @Transient
+    public String getHref() {
+        // TODO: implement AppConfigurator
+        String baseUri = "http://localhost:8080";
+        return baseUri + "/v1/message/" + this.id;
     }
 }

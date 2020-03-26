@@ -77,4 +77,11 @@ public class Status implements Serializable {
     public String getMsgId() {
         return this.msgId;
     }
+
+    @JsonProperty("href")
+    public String getHref() {
+        // TODO: implement AppConfigurator
+        String baseUri = "http://localhost:8080";
+        return baseUri + "/v1/message/" + this.msgId;
+    }
 }

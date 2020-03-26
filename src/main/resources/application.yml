@@ -1,0 +1,67 @@
+spring:
+  jpa:
+    hibernate:
+      ddl-auto: "update"
+  datasource:
+    url: jdbc:mysql://\${MYSQL_HOST:localhost}:3306/webhook
+    username: \${MYSQL_USER:root}
+    password: \${MYSQL_PWD:root}
+          
+server:
+  port: 8080
+  error:
+    whitelabel:
+      enabled: false
+    include-stacktrace: never
+
+logging:
+  level:
+    org: 
+      springframework: INFO
+
+webhook:
+  api:
+    prefix: /api/v1/
+    base_uri: "http://localhost:8080"
+    security:
+      jwt:
+        secret: webhookSecret
+        expirationMs: 86400000
+      user:
+        name: \${API_USER:admin}
+        password: \${API_PASSWORD:adminPassword}
+        email: \${API_EMAIL:admindummy-mail.com}
+  message:
+    page_size: 5
+  status:
+    page_size: 10
+  contact:
+    page_size: 5
+
+
+management:
+  server:
+    port: 9090
+  endpoints:
+    web:
+      base-path: /actuator/
+      path-mapping:
+        health: health
+      exposure:
+        include: "metrics, info, health"
+  metrics:
+    enable:
+      jvm: true
+      root: true
+    distribution:
+      percentiles-histogram:
+        http:
+          server:
+            requests: true
+
+info:
+  app:
+    description: ${description}
+    name: ${name}
+    version: ${version}
+    encoding: UTF-8

@@ -1,4 +1,4 @@
-package com.telekom.whatsapp.webhook.services;
+package com.telekom.whatsapp.monitoring;
 
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.Aspect;

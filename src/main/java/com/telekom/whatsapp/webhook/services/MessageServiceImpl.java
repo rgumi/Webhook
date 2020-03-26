@@ -24,7 +24,10 @@ import org.slf4j.LoggerFactory;
 public class MessageServiceImpl implements MessageService {
 
     @Value("${webhook.message.page_size}")
-    private int pageSize;
+    private int msgPageSize;
+
+    @Value("${webhook.status.page_size}")
+    private int statusPageSize;
 
     @Autowired
     private MessageRepository messageRepository;
@@ -76,8 +79,8 @@ public class MessageServiceImpl implements MessageService {
 
         Collection<Message> msgCollection = new ArrayList<>();
         
-        if (status.equals("*")) messageRepository.findAll(PageRequest.of(page, pageSize)).forEach(msgCollection::add);
-        if (!status.equals("*")) messageRepository.findByStatus(status, PageRequest.of(page, pageSize)).forEach(msgCollection::add);
+        if (status.equals("*")) messageRepository.findAll(PageRequest.of(page, msgPageSize)).forEach(msgCollection::add);
+        if (!status.equals("*")) messageRepository.findByStatus(status, PageRequest.of(page, msgPageSize)).forEach(msgCollection::add);
         
         return msgCollection;
     }
@@ -127,7 +130,7 @@ public class MessageServiceImpl implements MessageService {
     @Override
     public Collection<Status> getStatusesPaged(int page) {
         Collection<Status> msgCollection = new ArrayList<>();
-        messageRepository.getStatuses(PageRequest.of(page, pageSize)).forEach(msgCollection::add);
+        messageRepository.getStatuses(PageRequest.of(page, statusPageSize)).forEach(msgCollection::add);
         return msgCollection;
     }
 }

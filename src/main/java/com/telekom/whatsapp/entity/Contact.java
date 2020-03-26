@@ -92,4 +92,12 @@ public class Contact implements Serializable {
     public Date getUpdatedOn() {
         return this.updatedOn;
     }
+
+    @JsonProperty("href")
+    @Transient
+    public String getHref() {
+        // TODO: implement AppConfigurator
+        String baseUri = "http://localhost:8080";
+        return baseUri + "/v1/contact/" + this.id;
+    }
 }

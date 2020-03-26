@@ -19,7 +19,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @RestController
-@RequestMapping(path="${webhook.api_prefix}v1/message")
+@RequestMapping(path="${webhook.api.prefix}message")
 public class MessageController {
 
     private static final Logger logger = LoggerFactory.getLogger(MessageController.class);
